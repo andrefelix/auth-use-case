@@ -1,6 +1,6 @@
 class LoginRouter {
   route (httpRequest) {
-    if (!httpRequest) {
+    if (!httpRequest || !httpRequest.body) {
       return HttpResponse.serverError()
     }
 
@@ -48,6 +48,12 @@ describe('Login Router', () => {
   it('Should return 500 if httpRequest is not provided', () => {
     const sut = new LoginRouter()
     const httpResponse = sut.route()
+    expect(httpResponse.statusCode).toBe(500)
+  })
+
+  it('Should return 500 if body is not provided', () => {
+    const sut = new LoginRouter()
+    const httpResponse = sut.route({})
     expect(httpResponse.statusCode).toBe(500)
   })
 })
