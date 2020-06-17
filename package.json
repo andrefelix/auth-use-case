@@ -6,6 +6,9 @@
   "scripts": {
     "test": "jest"
   },
+  "standard": {
+    "env": ["jest"]
+  },
   "author": "André Félix de Freitas",
   "license": "ISC",
   "devDependencies": {
