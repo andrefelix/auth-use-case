@@ -41,12 +41,14 @@ describe('Login Router', () => {
     const { sut } = makeSut()
     const httpResponse = sut.route()
     expect(httpResponse.statusCode).toBe(500)
+    // expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should return 500 if body is not provided', () => {
     const { sut } = makeSut()
     const httpResponse = sut.route({})
     expect(httpResponse.statusCode).toBe(500)
+    // expect(httpResponse.body).toEqual(new ServerError())
   })
 
   it('Should call AuthUseCase with correct params', () => {
