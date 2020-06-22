@@ -15,6 +15,16 @@ const makeAuthuseCase = () => {
   return new AuthUseCaseSpy()
 }
 
+const makeAuthuseCaseWithError = () => {
+  class AuthUseCaseSpy {
+    auth (email, password) {
+      throw new Error()
+    }
+  }
+
+  return new AuthUseCaseSpy()
+}
+
 const makeSut = () => {
   const authUseCaseSpy = makeAuthuseCase()
   authUseCaseSpy.accessToken = 'valid_token'
@@ -138,5 +148,21 @@ describe('Login Router', () => {
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body.accessToken).toEqual(authUseCaseSpy.accessToken)
+  })
+
+  it('Should return 500 if AuthUseCase throws', () => {
+    const authUseCaseSpyWithError = makeAuthuseCaseWithError()
+    authUseCaseSpyWithError.accessToken = 'any_token'
+
+    const sut = new LoginRouter(authUseCaseSpyWithError)
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password@mail.com'
+      }
+    }
+    const httpResponse = sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 })
