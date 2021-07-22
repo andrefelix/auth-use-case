@@ -32,7 +32,7 @@ module.exports = class LoginRouter {
 
       return HttpResponse.ok({ accessToken })
     } catch (error) {
-      if (process.env.NODE_ENV !== 'test') console.error(error)
+      console.error(error)
       return HttpResponse.serverError()
     }
   }
