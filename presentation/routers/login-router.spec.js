@@ -220,7 +220,7 @@ describe('Login Router', () => {
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  it('Should return 500 if ValidatorEmail throws', async () => {
+  it('Should return 500 if EmailValidator throws', async () => {
     const authUseCaseSpyWithError = makeAuthuseCase()
     const emailValidatorSpyWithError = makeEmailValidatorWithError()
     const sut = new LoginRouter(authUseCaseSpyWithError, emailValidatorSpyWithError)
