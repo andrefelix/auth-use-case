@@ -45,7 +45,7 @@ const makeEmailValidator = () => {
 
 const makeEmailValidatorWithError = () => {
   class EmailValidatorSpy {
-    async auth () {
+    isValid () {
       throw new Error()
     }
   }
@@ -221,7 +221,7 @@ describe('Login Router', () => {
   })
 
   it('Should return 500 if ValidatorEmail throws', async () => {
-    const authUseCaseSpyWithError = makeAuthuseCaseWithError()
+    const authUseCaseSpyWithError = makeAuthuseCase()
     const emailValidatorSpyWithError = makeEmailValidatorWithError()
     const sut = new LoginRouter(authUseCaseSpyWithError, emailValidatorSpyWithError)
     const httpRequest = {
