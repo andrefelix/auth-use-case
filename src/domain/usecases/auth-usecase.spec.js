@@ -1,13 +1,5 @@
+const AuthUseCase = require('./auth-usecase')
 const { MissingParamError } = require('../../utils/errors')
-
-class AuthUseCase {
-  async auth (email, password) {
-    if (!email || !password) {
-      const missingParam = !email ? 'email' : 'password'
-      throw new MissingParamError(missingParam)
-    }
-  }
-}
 
 function makeSut () {
   return new AuthUseCase()
