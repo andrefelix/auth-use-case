@@ -1,6 +1,6 @@
 class AuthUseCase {
-  async auth (email) {
-    if (!email) {
+  async auth (email, password) {
+    if (!email || !password) {
       throw new Error()
     }
   }
@@ -13,6 +13,13 @@ function makeSut () {
 describe('Auth Use Case', () => {
   it('should throw Error if no email is provided', async () => {
     const sut = makeSut()
-    await expect(sut.auth()).rejects.toThrow()
+    const promise = sut.auth()
+    await expect(promise).rejects.toThrow()
+  })
+
+  it('should throw Error if no password is provided', async () => {
+    const sut = makeSut()
+    const promise = sut.auth('any_email@mail.com')
+    await expect(promise).rejects.toThrow()
   })
 })
