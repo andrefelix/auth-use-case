@@ -1,10 +1,17 @@
 const AuthUseCase = require('./auth-usecase')
 const { MissingParamError } = require('../../utils/errors')
 
-function makeSut () {
-  const sut = new AuthUseCase()
+class LoadUserByEmailRepository {
+  async load (email) {
+    this.email = email
+  }
+}
 
-  return { sut }
+function makeSut () {
+  const loadUserByEmailRepository = new LoadUserByEmailRepository()
+  const sut = new AuthUseCase(loadUserByEmailRepository)
+
+  return { sut, loadUserByEmailRepository }
 }
 
 describe('Auth Use Case', () => {
@@ -18,5 +25,11 @@ describe('Auth Use Case', () => {
     const { sut } = makeSut()
     const promise = sut.auth('any_email@mail.com')
     await expect(promise).rejects.toThrow(new MissingParamError('password'))
+  })
+
+  it('should call LoadUserByEmailRepository with correct email', async () => {
+    const { sut, loadUserByEmailRepository } = makeSut()
+    await sut.auth('any_email@mail.com', 'any_password')
+    expect(loadUserByEmailRepository.email).toBe('any_email@mail.com')
   })
 })
