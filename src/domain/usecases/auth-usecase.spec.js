@@ -4,11 +4,19 @@ const { MissingParamError, InvalidParamError } = require('../../utils/errors')
 class LoadUserByEmailRepositorySpy {
   async load (email) {
     this.email = email
+    return this.user
   }
 }
 
-function makeSut () {
+function makeLoadUserByEmailRepository () {
   const loadUserByEmailRepository = new LoadUserByEmailRepositorySpy()
+  loadUserByEmailRepository.user = {}
+
+  return loadUserByEmailRepository
+}
+
+function makeSut () {
+  const loadUserByEmailRepository = makeLoadUserByEmailRepository()
   const sut = new AuthUseCase(loadUserByEmailRepository)
 
   return { sut, loadUserByEmailRepository }
@@ -45,9 +53,10 @@ describe('Auth Use Case', () => {
     await expect(promise).rejects.toThrow(new InvalidParamError('loadUserByEmailRepository'))
   })
 
-  it('should return null if LoadUserByEmailRepository load method returns null', async () => {
-    const { sut } = makeSut()
-    const userToken = await sut.auth('any_email@mail.com', 'any_password')
-    expect(userToken).toBeNull()
+  it('should return null if no valid email has provided', async () => {
+    const { sut, loadUserByEmailRepository } = makeSut()
+    loadUserByEmailRepository.user = null
+    const accessToken = await sut.auth('invalid_email@mail.com', 'any_password')
+    expect(accessToken).toBeNull()
   })
 })
