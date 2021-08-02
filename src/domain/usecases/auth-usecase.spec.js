@@ -9,17 +9,17 @@ class LoadUserByEmailRepositorySpy {
 }
 
 function makeLoadUserByEmailRepository () {
-  const loadUserByEmailRepository = new LoadUserByEmailRepositorySpy()
-  loadUserByEmailRepository.user = {}
+  const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy()
+  loadUserByEmailRepositorySpy.user = {}
 
-  return loadUserByEmailRepository
+  return loadUserByEmailRepositorySpy
 }
 
 function makeSut () {
-  const loadUserByEmailRepository = makeLoadUserByEmailRepository()
-  const sut = new AuthUseCase(loadUserByEmailRepository)
+  const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository()
+  const sut = new AuthUseCase(loadUserByEmailRepositorySpy)
 
-  return { sut, loadUserByEmailRepository }
+  return { sut, loadUserByEmailRepositorySpy }
 }
 
 describe('Auth Use Case', () => {
@@ -36,9 +36,9 @@ describe('Auth Use Case', () => {
   })
 
   it('should call LoadUserByEmailRepository with correct email', async () => {
-    const { sut, loadUserByEmailRepository } = makeSut()
+    const { sut, loadUserByEmailRepositorySpy } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
-    expect(loadUserByEmailRepository.email).toBe('any_email@mail.com')
+    expect(loadUserByEmailRepositorySpy.email).toBe('any_email@mail.com')
   })
 
   it('should trown if no LoadUserByEmailRepository is provided', async () => {
@@ -54,8 +54,8 @@ describe('Auth Use Case', () => {
   })
 
   it('should return null if no valid email has provided', async () => {
-    const { sut, loadUserByEmailRepository } = makeSut()
-    loadUserByEmailRepository.user = null
+    const { sut, loadUserByEmailRepositorySpy } = makeSut()
+    loadUserByEmailRepositorySpy.user = null
     const accessToken = await sut.auth('invalid_email@mail.com', 'any_password')
     expect(accessToken).toBeNull()
   })
