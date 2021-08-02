@@ -42,7 +42,7 @@ function makeTokenGenerator () {
   }
 
   const tokenGeneratorSpy = new TokenGeneratorSpy()
-  tokenGeneratorSpy.accessToken = ''
+  tokenGeneratorSpy.accessToken = 'any_token'
 
   return tokenGeneratorSpy
 }
@@ -113,5 +113,11 @@ describe('Auth Use Case', () => {
     const { sut, tokenGeneratorSpy, loadUserByEmailRepositorySpy } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
     expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user.id)
+  })
+
+  it('should an accessToken if correct credentials are provided', async () => {
+    const { sut } = makeSut()
+    const accesToken = await sut.auth('valid_email@mail.com', 'valid_password')
+    expect(accesToken).toBeTruthy()
   })
 })

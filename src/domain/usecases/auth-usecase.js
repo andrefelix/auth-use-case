@@ -23,6 +23,8 @@ module.exports = class AuthUseCase {
       return null
     }
 
-    await this.tokenGenerator.generate(this.loadUserByEmailRepository.user.id)
+    const accessToken = await this.tokenGenerator.generate(this.loadUserByEmailRepository.user.id)
+
+    return accessToken
   }
 }
