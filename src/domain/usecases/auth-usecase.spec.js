@@ -79,7 +79,8 @@ describe('Auth Use Case', () => {
   })
 
   it('should return null if no valid password has provided', async () => {
-    const { sut } = makeSut()
+    const { sut, encryptorSpy } = makeSut()
+    encryptorSpy.isValid = false
     const accessToken = await sut.auth('valid_email@mail.com', 'invalid_password')
     expect(accessToken).toBeNull()
   })
