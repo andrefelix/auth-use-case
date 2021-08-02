@@ -59,4 +59,10 @@ describe('Auth Use Case', () => {
     const accessToken = await sut.auth('invalid_email@mail.com', 'any_password')
     expect(accessToken).toBeNull()
   })
+
+  it('should return null if no valid password has provided', async () => {
+    const { sut } = makeSut()
+    const accessToken = await sut.auth('valid_email@mail.com', 'invalid_password')
+    expect(accessToken).toBeNull()
+  })
 })
