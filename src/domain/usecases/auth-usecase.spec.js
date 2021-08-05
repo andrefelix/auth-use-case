@@ -18,6 +18,14 @@ function makeLoadUserByEmailRepository () {
   return loadUserByEmailRepositorySpy
 }
 
+function makeUpdateUserRepository () {
+  class UpdateUserRepositorySpy {
+    async update () {}
+  }
+
+  return new UpdateUserRepositorySpy()
+}
+
 function makeEncryptor () {
   class EncryptorSpy {
     async compare (password, hashedPassword) {
@@ -49,16 +57,18 @@ function makeTokenGenerator () {
 
 function makeSut () {
   const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository()
+  const updateUserRepositorySpy = makeUpdateUserRepository()
   const encryptorSpy = makeEncryptor()
   const tokenGeneratorSpy = makeTokenGenerator()
 
   const sut = new AuthUseCase({
     loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+    updateUserRepository: updateUserRepositorySpy,
     encryptor: encryptorSpy,
     tokenGenerator: tokenGeneratorSpy
   })
 
-  return { sut, loadUserByEmailRepositorySpy, encryptorSpy, tokenGeneratorSpy }
+  return { sut, loadUserByEmailRepositorySpy, updateUserRepositorySpy, encryptorSpy, tokenGeneratorSpy }
 }
 
 describe('Auth Use Case', () => {
@@ -116,10 +126,11 @@ describe('Auth Use Case', () => {
     })
 
     it('should trown if no valid dependencies are provided', async () => {
-      const { loadUserByEmailRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
+      const { loadUserByEmailRepositorySpy, updateUserRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
 
       const allDependencies = {
         loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+        updateUserRepository: updateUserRepositorySpy,
         encryptor: encryptorSpy,
         tokenGenerator: tokenGeneratorSpy
       }
@@ -130,6 +141,8 @@ describe('Auth Use Case', () => {
       const invalidEncriptor = { ...allDependencies, encryptor: {} }
       const withoutTokenGenerator = { ...allDependencies, tokenGenerator: null }
       const invalidTokenGenerator = { ...allDependencies, tokenGenerator: {} }
+      const withoutUpdateUserRepository = { ...allDependencies, updateUserRepository: null }
+      const invalidUpdateUserRepository = { ...allDependencies, updateUserRepository: {} }
 
       const suts = [
         new AuthUseCase(),
@@ -138,7 +151,9 @@ describe('Auth Use Case', () => {
         new AuthUseCase(withoutEncriptor),
         new AuthUseCase(invalidEncriptor),
         new AuthUseCase(withoutTokenGenerator),
-        new AuthUseCase(invalidTokenGenerator)
+        new AuthUseCase(invalidTokenGenerator),
+        new AuthUseCase(withoutUpdateUserRepository),
+        new AuthUseCase(invalidUpdateUserRepository)
       ]
 
       for (const sut of suts) {
