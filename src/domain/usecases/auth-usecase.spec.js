@@ -128,6 +128,7 @@ describe('Auth Use Case', () => {
       const invalidLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: {} }
 
       const suts = [
+        new AuthUseCase(),
         new AuthUseCase(withoutLoadUserByEmailRepository),
         new AuthUseCase(invalidLoadUserByEmailRepository)
       ]
