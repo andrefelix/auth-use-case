@@ -115,18 +115,27 @@ describe('Auth Use Case', () => {
       await expect(promise).rejects.toThrow(new MissingParamError('password'))
     })
 
-    it('should trown if no LoadUserByEmailRepository is provided', async () => {
-      const sut = new AuthUseCase()
-      const promise = sut.auth('any_email@mail.com', 'any_password')
-      await expect(promise).rejects.toThrow()
-    })
+    it('should trown if no valid dependencies are provided', async () => {
+      const { loadUserByEmailRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
 
-    it('should trown if LoadUserByEmailRepository has no load method', async () => {
-      const sut = new AuthUseCase({
-        loadUserByEmailRepository: {}
-      })
-      const promise = sut.auth('any_email@mail.com', 'any_password')
-      await expect(promise).rejects.toThrow()
+      const allDependencies = {
+        loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+        encryptor: encryptorSpy,
+        tokenGenerator: tokenGeneratorSpy
+      }
+
+      const withoutLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: null }
+      const invalidLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: {} }
+
+      const suts = [
+        new AuthUseCase(withoutLoadUserByEmailRepository),
+        new AuthUseCase(invalidLoadUserByEmailRepository)
+      ]
+
+      for (const sut of suts) {
+        const promise = sut.auth('any_email@mail.com', 'any_password')
+        await expect(promise).rejects.toThrow()
+      }
     })
   })
 })
