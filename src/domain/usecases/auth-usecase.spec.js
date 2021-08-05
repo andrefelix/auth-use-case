@@ -20,7 +20,10 @@ function makeLoadUserByEmailRepository () {
 
 function makeUpdateAccessTokenRepository () {
   class UpdateAccessTokenRepositorySpy {
-    async update () {}
+    async update (userId, accessToken) {
+      this.userId = userId
+      this.accessToken = accessToken
+    }
   }
 
   return new UpdateAccessTokenRepositorySpy()
@@ -108,8 +111,15 @@ describe('Auth Use Case', () => {
 
   it('should an accessToken if correct credentials are provided', async () => {
     const { sut } = makeSut()
-    const accesToken = await sut.auth('valid_email@mail.com', 'valid_password')
-    expect(accesToken).toBeTruthy()
+    const accessToken = await sut.auth('valid_email@mail.com', 'valid_password')
+    expect(accessToken).toBeTruthy()
+  })
+
+  it('should call UpdateAccessTokenRepository with correct values', async () => {
+    const { sut, updateAccessTokenRepositorySpy, loadUserByEmailRepositorySpy, tokenGeneratorSpy } = makeSut()
+    await sut.auth('any_email@mail.com', 'any_password')
+    expect(updateAccessTokenRepositorySpy.userId).toBe(loadUserByEmailRepositorySpy.user.id)
+    expect(updateAccessTokenRepositorySpy.accessToken).toBe(tokenGeneratorSpy.accessToken)
   })
 
   describe('Throw Error', () => {
