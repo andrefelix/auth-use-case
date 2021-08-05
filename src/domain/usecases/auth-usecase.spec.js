@@ -176,13 +176,11 @@ describe('Auth Use Case', () => {
     })
 
     it('should throw if no valid dependencies are provided', async () => {
-      const { loadUserByEmailRepositorySpy, updateAccessTokenRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
-
       const allDependencies = {
-        loadUserByEmailRepository: loadUserByEmailRepositorySpy,
-        updateAccessTokenRepository: updateAccessTokenRepositorySpy,
-        encryptor: encryptorSpy,
-        tokenGenerator: tokenGeneratorSpy
+        loadUserByEmailRepository: makeLoadUserByEmailRepository(),
+        updateAccessTokenRepository: makeUpdateAccessTokenRepository(),
+        encryptor: makeEncryptor(),
+        tokenGenerator: makeTokenGenerator()
       }
 
       const withoutLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: null }
@@ -213,13 +211,11 @@ describe('Auth Use Case', () => {
     })
 
     it('should throw a Error if dependencies throw a Error', async () => {
-      const { loadUserByEmailRepositorySpy, updateAccessTokenRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
-
       const allDependencies = {
-        loadUserByEmailRepository: loadUserByEmailRepositorySpy,
-        updateAccessTokenRepository: updateAccessTokenRepositorySpy,
-        encryptor: encryptorSpy,
-        tokenGenerator: tokenGeneratorSpy
+        loadUserByEmailRepository: makeLoadUserByEmailRepository(),
+        updateAccessTokenRepository: makeUpdateAccessTokenRepository(),
+        encryptor: makeEncryptor(),
+        tokenGenerator: makeTokenGenerator()
       }
 
       const LoadUserByEmailRepositoryWithError = {
