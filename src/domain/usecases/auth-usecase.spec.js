@@ -18,11 +18,31 @@ function makeLoadUserByEmailRepository () {
   return loadUserByEmailRepositorySpy
 }
 
+function makeLoadUserByEmailRepositoryWithError () {
+  class LoadUserByEmailRepositorySpy {
+    async load () {
+      throw new Error()
+    }
+  }
+
+  return new LoadUserByEmailRepositorySpy()
+}
+
 function makeUpdateAccessTokenRepository () {
   class UpdateAccessTokenRepositorySpy {
     async update (userId, accessToken) {
       this.userId = userId
       this.accessToken = accessToken
+    }
+  }
+
+  return new UpdateAccessTokenRepositorySpy()
+}
+
+function makeUpdateAccessTokenRepositoryWithError () {
+  class UpdateAccessTokenRepositorySpy {
+    async update () {
+      throw new Error()
     }
   }
 
@@ -44,6 +64,16 @@ function makeEncryptor () {
   return encryptorSpy
 }
 
+function makeEncryptorWithError () {
+  class EncryptorSpy {
+    async compare () {
+      throw new Error()
+    }
+  }
+
+  return new EncryptorSpy()
+}
+
 function makeTokenGenerator () {
   class TokenGeneratorSpy {
     async generate (userId) {
@@ -56,6 +86,16 @@ function makeTokenGenerator () {
   tokenGeneratorSpy.accessToken = 'any_token'
 
   return tokenGeneratorSpy
+}
+
+function makeTokenGeneratorWithError () {
+  class TokenGeneratorSpy {
+    async generate () {
+      throw new Error()
+    }
+  }
+
+  return new TokenGeneratorSpy()
 }
 
 function makeSut () {
@@ -135,7 +175,7 @@ describe('Auth Use Case', () => {
       await expect(promise).rejects.toThrow(new MissingParamError('password'))
     })
 
-    it('should trown if no valid dependencies are provided', async () => {
+    it('should throw if no valid dependencies are provided', async () => {
       const { loadUserByEmailRepositorySpy, updateAccessTokenRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
 
       const allDependencies = {
@@ -164,6 +204,42 @@ describe('Auth Use Case', () => {
         new AuthUseCase(invalidTokenGenerator),
         new AuthUseCase(withoutUpdateAccessTokenRepository),
         new AuthUseCase(invalidUpdateAccessTokenRepository)
+      ]
+
+      for (const sut of suts) {
+        const promise = sut.auth('any_email@mail.com', 'any_password')
+        await expect(promise).rejects.toThrow()
+      }
+    })
+
+    it('should throw a Error if dependencies throw a Error', async () => {
+      const { loadUserByEmailRepositorySpy, updateAccessTokenRepositorySpy, encryptorSpy, tokenGeneratorSpy } = makeSut()
+
+      const allDependencies = {
+        loadUserByEmailRepository: loadUserByEmailRepositorySpy,
+        updateAccessTokenRepository: updateAccessTokenRepositorySpy,
+        encryptor: encryptorSpy,
+        tokenGenerator: tokenGeneratorSpy
+      }
+
+      const LoadUserByEmailRepositoryWithError = {
+        ...allDependencies,
+        loadUserByEmailRepository: makeLoadUserByEmailRepositoryWithError()
+      }
+
+      const EncriptorWithError = { ...allDependencies, encryptor: makeEncryptorWithError() }
+      const TokenGeneratorWithError = { ...allDependencies, tokenGenerator: makeTokenGeneratorWithError() }
+
+      const UpdateAccessTokenRepositoryWithError = {
+        ...allDependencies,
+        updateAccessTokenRepository: makeUpdateAccessTokenRepositoryWithError()
+      }
+
+      const suts = [
+        new AuthUseCase(LoadUserByEmailRepositoryWithError),
+        new AuthUseCase(EncriptorWithError),
+        new AuthUseCase(TokenGeneratorWithError),
+        new AuthUseCase(UpdateAccessTokenRepositoryWithError)
       ]
 
       for (const sut of suts) {
