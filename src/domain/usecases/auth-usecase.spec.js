@@ -126,11 +126,15 @@ describe('Auth Use Case', () => {
 
       const withoutLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: null }
       const invalidLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: {} }
+      const withoutEncriptor = { ...allDependencies, encryptor: null }
+      const invalidEncriptor = { ...allDependencies, encryptor: {} }
 
       const suts = [
         new AuthUseCase(),
         new AuthUseCase(withoutLoadUserByEmailRepository),
-        new AuthUseCase(invalidLoadUserByEmailRepository)
+        new AuthUseCase(invalidLoadUserByEmailRepository),
+        new AuthUseCase(withoutEncriptor),
+        new AuthUseCase(invalidEncriptor)
       ]
 
       for (const sut of suts) {
