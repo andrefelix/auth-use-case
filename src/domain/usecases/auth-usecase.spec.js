@@ -49,8 +49,8 @@ function makeUpdateAccessTokenRepositoryWithError () {
   return new UpdateAccessTokenRepositorySpy()
 }
 
-function makeEncryptor () {
-  class EncryptorSpy {
+function makeEncrypter () {
+  class EncrypterSpy {
     async compare (password, hashedPassword) {
       this.password = password
       this.hashedPassword = hashedPassword
@@ -58,20 +58,20 @@ function makeEncryptor () {
     }
   }
 
-  const encryptorSpy = new EncryptorSpy()
-  encryptorSpy.isValid = true
+  const encrypterSpy = new EncrypterSpy()
+  encrypterSpy.isValid = true
 
-  return encryptorSpy
+  return encrypterSpy
 }
 
-function makeEncryptorWithError () {
-  class EncryptorSpy {
+function makeEncrypterWithError () {
+  class EncrypterSpy {
     async compare () {
       throw new Error()
     }
   }
 
-  return new EncryptorSpy()
+  return new EncrypterSpy()
 }
 
 function makeTokenGenerator () {
@@ -101,17 +101,17 @@ function makeTokenGeneratorWithError () {
 function makeSut () {
   const loadUserByEmailRepositorySpy = makeLoadUserByEmailRepository()
   const updateAccessTokenRepositorySpy = makeUpdateAccessTokenRepository()
-  const encryptorSpy = makeEncryptor()
+  const encrypterSpy = makeEncrypter()
   const tokenGeneratorSpy = makeTokenGenerator()
 
   const sut = new AuthUseCase({
     loadUserByEmailRepository: loadUserByEmailRepositorySpy,
     updateAccessTokenRepository: updateAccessTokenRepositorySpy,
-    encryptor: encryptorSpy,
+    encrypter: encrypterSpy,
     tokenGenerator: tokenGeneratorSpy
   })
 
-  return { sut, loadUserByEmailRepositorySpy, updateAccessTokenRepositorySpy, encryptorSpy, tokenGeneratorSpy }
+  return { sut, loadUserByEmailRepositorySpy, updateAccessTokenRepositorySpy, encrypterSpy, tokenGeneratorSpy }
 }
 
 describe('Auth Use Case', () => {
@@ -129,18 +129,18 @@ describe('Auth Use Case', () => {
   })
 
   it('should return null if no valid password has provided', async () => {
-    const { sut, encryptorSpy } = makeSut()
-    encryptorSpy.isValid = false
+    const { sut, encrypterSpy } = makeSut()
+    encrypterSpy.isValid = false
     const accessToken = await sut.auth('valid_email@mail.com', 'invalid_password')
     expect(accessToken).toBeNull()
   })
 
-  it('should call Encryptor with correct values', async () => {
-    const { sut, encryptorSpy, loadUserByEmailRepositorySpy } = makeSut()
+  it('should call Encrypter with correct values', async () => {
+    const { sut, encrypterSpy, loadUserByEmailRepositorySpy } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
-    expect(encryptorSpy.password).toBe('any_password')
-    expect(encryptorSpy.hashedPassword).toBeTruthy()
-    expect(encryptorSpy.hashedPassword).toBe(loadUserByEmailRepositorySpy.user.password)
+    expect(encrypterSpy.password).toBe('any_password')
+    expect(encrypterSpy.hashedPassword).toBeTruthy()
+    expect(encrypterSpy.hashedPassword).toBe(loadUserByEmailRepositorySpy.user.password)
   })
 
   it('should call TokenGenerator with correct userId', async () => {
@@ -179,14 +179,14 @@ describe('Auth Use Case', () => {
       const allDependencies = {
         loadUserByEmailRepository: makeLoadUserByEmailRepository(),
         updateAccessTokenRepository: makeUpdateAccessTokenRepository(),
-        encryptor: makeEncryptor(),
+        encrypter: makeEncrypter(),
         tokenGenerator: makeTokenGenerator()
       }
 
       const withoutLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: null }
       const invalidLoadUserByEmailRepository = { ...allDependencies, loadUserByEmailRepository: {} }
-      const withoutEncriptor = { ...allDependencies, encryptor: null }
-      const invalidEncriptor = { ...allDependencies, encryptor: {} }
+      const withoutEncripter = { ...allDependencies, encrypter: null }
+      const invalidEncripter = { ...allDependencies, encrypter: {} }
       const withoutTokenGenerator = { ...allDependencies, tokenGenerator: null }
       const invalidTokenGenerator = { ...allDependencies, tokenGenerator: {} }
       const withoutUpdateAccessTokenRepository = { ...allDependencies, updateAccessTokenRepository: null }
@@ -196,8 +196,8 @@ describe('Auth Use Case', () => {
         new AuthUseCase(),
         new AuthUseCase(withoutLoadUserByEmailRepository),
         new AuthUseCase(invalidLoadUserByEmailRepository),
-        new AuthUseCase(withoutEncriptor),
-        new AuthUseCase(invalidEncriptor),
+        new AuthUseCase(withoutEncripter),
+        new AuthUseCase(invalidEncripter),
         new AuthUseCase(withoutTokenGenerator),
         new AuthUseCase(invalidTokenGenerator),
         new AuthUseCase(withoutUpdateAccessTokenRepository),
@@ -214,7 +214,7 @@ describe('Auth Use Case', () => {
       const allDependencies = {
         loadUserByEmailRepository: makeLoadUserByEmailRepository(),
         updateAccessTokenRepository: makeUpdateAccessTokenRepository(),
-        encryptor: makeEncryptor(),
+        encrypter: makeEncrypter(),
         tokenGenerator: makeTokenGenerator()
       }
 
@@ -223,7 +223,7 @@ describe('Auth Use Case', () => {
         loadUserByEmailRepository: makeLoadUserByEmailRepositoryWithError()
       }
 
-      const EncriptorWithError = { ...allDependencies, encryptor: makeEncryptorWithError() }
+      const EncriptorWithError = { ...allDependencies, encrypter: makeEncrypterWithError() }
       const TokenGeneratorWithError = { ...allDependencies, tokenGenerator: makeTokenGeneratorWithError() }
 
       const UpdateAccessTokenRepositoryWithError = {
