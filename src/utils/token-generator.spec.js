@@ -30,13 +30,11 @@ describe('Token Generator', () => {
     const sut = makeSut()
     await sut.generate('any_id')
     expect(jwt.id).toBe('any_id')
-    expect(jwt.secret).toBeTruthy()
     expect(jwt.secret).toBe(sut.secret)
   })
 
   it('should throw if no secret is provided', async () => {
-    const sut = makeSut()
-    sut.secret = null
+    const sut = new TokenGenerator()
     const promise = sut.generate('any_id')
     await expect(promise).rejects.toThrow(new MissingParamError('secret'))
   })
