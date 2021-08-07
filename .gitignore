@@ -5,3 +5,6 @@ coverage
 
 # editor settings
 .vscode
+
+# @shelf/jest-mongodb library config
+globalConfig.json
