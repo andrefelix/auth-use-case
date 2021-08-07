@@ -16,22 +16,11 @@ class LoadUserByEmailRepository {
   }
 }
 
-async function makeSut () {
-  const mockUser = {
-    _id: 'some_user_id',
-    email: 'valid_email@mail.com',
-    password: 'hashed_password',
-    age: 32,
-    state: 'any_state'
-  }
-
+function makeSut () {
   const userModel = db.collection(COLLECTION_USERS)
-
-  await userModel.insertOne(mockUser)
-
   const sut = new LoadUserByEmailRepository(userModel)
 
-  return { sut, mockUser }
+  return { sut, userModel }
 }
 
 describe('LoadUserByEmail Repository', () => {
@@ -52,14 +41,26 @@ describe('LoadUserByEmail Repository', () => {
   })
 
   it('should return null if no user is found', async () => {
-    const { sut } = await makeSut()
+    const { sut } = makeSut()
     const user = await sut.load('invalid_email@mail.com')
     expect(user).toBeNull()
   })
 
   it('should return an user if user is found', async () => {
-    const { sut, mockUser } = await makeSut()
+    const { sut, userModel } = makeSut()
+
+    const mockUser = {
+      _id: 'some_user_id',
+      email: 'valid_email@mail.com',
+      password: 'hashed_password',
+      age: 32,
+      state: 'any_state'
+    }
+
+    await userModel.insertOne(mockUser)
+
     const user = await sut.load(mockUser.email)
+
     expect(user).toEqual(mockUser)
   })
 })
