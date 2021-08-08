@@ -34,13 +34,7 @@ function makeSut () {
 }
 
 describe('UpdateAccessToken Repository', () => {
-  const fakeUser = {
-    _id: 'some_user_id',
-    email: 'valid_email@mail.com',
-    password: 'hashed_password',
-    age: 32,
-    state: 'any_state'
-  }
+  let fakeUser = null
 
   beforeAll(async () => {
     await MongodbHelper.connect(process.env.MONGO_URL)
@@ -49,7 +43,14 @@ describe('UpdateAccessToken Repository', () => {
 
   beforeEach(async () => {
     const userModel = db.collection(COLLECTION_USERS)
-    userModel.insertOne(fakeUser)
+    const result = await userModel.insertOne({
+      email: 'valid_email@mail.com',
+      password: 'hashed_password',
+      age: 32,
+      state: 'any_state'
+    })
+
+    fakeUser = result.ops[0]
   })
 
   afterEach(async () => {
