@@ -58,4 +58,12 @@ describe('UpdateAccessToken Repository', () => {
     const user = await userModel.findOne({ _id: fakeUser._id })
     expect(user.accessToken).toBe('valid_accesToken')
   })
+
+  describe('Throw Error', () => {
+    it('should throw if userModel is not provided', async () => {
+      const sut = new UpdateAccessTokenRepository()
+      const promise = sut.update(fakeUser._id, 'valid_accessToken')
+      await expect(promise).rejects.toThrow()
+    })
+  })
 })
