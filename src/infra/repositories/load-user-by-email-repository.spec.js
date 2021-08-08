@@ -14,9 +14,22 @@ function makeSut () {
 }
 
 describe('LoadUserByEmail Repository', () => {
+  const fakeUser = {
+    _id: 'some_user_id',
+    email: 'valid_email@mail.com',
+    password: 'hashed_password',
+    age: 32,
+    state: 'any_state'
+  }
+
   beforeAll(async () => {
     await MongodbHelper.connect(process.env.MONGO_URL)
     db = await MongodbHelper.getDB()
+  })
+
+  beforeEach(async () => {
+    const userModel = db.collection(COLLECTION_USERS)
+    userModel.insertOne(fakeUser)
   })
 
   afterEach(async () => {
@@ -34,18 +47,7 @@ describe('LoadUserByEmail Repository', () => {
   })
 
   it('should return an user if user is found', async () => {
-    const { sut, userModel } = makeSut()
-
-    const fakeUser = {
-      _id: 'some_user_id',
-      email: 'valid_email@mail.com',
-      password: 'hashed_password',
-      age: 32,
-      state: 'any_state'
-    }
-
-    await userModel.insertOne(fakeUser)
-
+    const { sut } = makeSut()
     const user = await sut.load(fakeUser.email)
 
     expect(user).toEqual({ _id: fakeUser._id, password: fakeUser.password })
