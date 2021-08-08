@@ -8,9 +8,7 @@ let db = null
 
 function makeSut () {
   const userModel = db.collection(COLLECTION_USERS)
-  const sut = new UpdateAccessTokenRepository(userModel)
-
-  return { sut, userModel }
+  return new UpdateAccessTokenRepository(userModel)
 }
 
 describe('UpdateAccessToken Repository', () => {
@@ -19,11 +17,8 @@ describe('UpdateAccessToken Repository', () => {
   beforeAll(async () => {
     await MongodbHelper.connect(process.env.MONGO_URL)
     db = await MongodbHelper.getDB()
-  })
 
-  beforeEach(async () => {
-    const userModel = db.collection(COLLECTION_USERS)
-    const result = await userModel.insertOne({
+    const result = await db.collection(COLLECTION_USERS).insertOne({
       email: 'valid_email@mail.com',
       password: 'hashed_password',
       age: 32,
@@ -33,19 +28,16 @@ describe('UpdateAccessToken Repository', () => {
     fakeUser = result.ops[0]
   })
 
-  afterEach(async () => {
-    await db.collection(COLLECTION_USERS).deleteMany({})
-  })
-
   afterAll(async () => {
+    await db.collection(COLLECTION_USERS).deleteOne({ _id: fakeUser._id })
     await MongodbHelper.disconnect()
   })
 
   it('should update the user with the given accessToken', async () => {
-    const { sut, userModel } = makeSut()
+    const sut = makeSut()
     await sut.update(fakeUser._id, 'valid_accesToken')
 
-    const user = await userModel.findOne({ _id: fakeUser._id })
+    const user = await sut.userModel.findOne({ _id: fakeUser._id })
     expect(user.accessToken).toBe('valid_accesToken')
   })
 
@@ -57,7 +49,7 @@ describe('UpdateAccessToken Repository', () => {
     })
 
     it('should throw if parameters are not provided', async () => {
-      const { sut } = makeSut()
+      const sut = makeSut()
       await expect(sut.update()).rejects.toThrow(new MissingParamError('userId'))
       await expect(sut.update(fakeUser._id)).rejects.toThrow(new MissingParamError('accessToken'))
     })

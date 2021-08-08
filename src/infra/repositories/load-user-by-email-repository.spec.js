@@ -8,9 +8,7 @@ let db = null
 
 function makeSut () {
   const userModel = db.collection(COLLECTION_USERS)
-  const sut = new LoadUserByEmailRepository(userModel)
-
-  return { sut, userModel }
+  return new LoadUserByEmailRepository(userModel)
 }
 
 describe('LoadUserByEmail Repository', () => {
@@ -19,11 +17,8 @@ describe('LoadUserByEmail Repository', () => {
   beforeAll(async () => {
     await MongodbHelper.connect(process.env.MONGO_URL)
     db = await MongodbHelper.getDB()
-  })
 
-  beforeEach(async () => {
-    const userModel = db.collection(COLLECTION_USERS)
-    const result = await userModel.insertOne({
+    const result = await db.collection(COLLECTION_USERS).insertOne({
       email: 'valid_email@mail.com',
       password: 'hashed_password',
       age: 32,
@@ -33,22 +28,19 @@ describe('LoadUserByEmail Repository', () => {
     fakeUser = result.ops[0]
   })
 
-  afterEach(async () => {
-    await db.collection(COLLECTION_USERS).deleteMany({})
-  })
-
   afterAll(async () => {
+    await db.collection(COLLECTION_USERS).deleteOne({ _id: fakeUser._id })
     await MongodbHelper.disconnect()
   })
 
   it('should return null if no user is found', async () => {
-    const { sut } = makeSut()
+    const sut = makeSut()
     const user = await sut.load('invalid_email@mail.com')
     expect(user).toBeNull()
   })
 
   it('should return an user if user is found', async () => {
-    const { sut } = makeSut()
+    const sut = makeSut()
     const user = await sut.load(fakeUser.email)
 
     expect(user).toEqual({ _id: fakeUser._id, password: fakeUser.password })
@@ -62,7 +54,7 @@ describe('LoadUserByEmail Repository', () => {
     })
 
     it('should throw if email is not provided', async () => {
-      const { sut } = makeSut()
+      const sut = makeSut()
       const promise = sut.load()
       await expect(promise).rejects.toThrow(new MissingParamError('email'))
     })
