@@ -12,28 +12,23 @@ function makeSut () {
 }
 
 describe('UpdateAccessToken Repository', () => {
-  let fakeUser = null
+  const fakeUser = {
+    _id: 'any_id',
+    email: 'valid_email@mail.com',
+    password: 'hashed_password',
+    age: 32,
+    state: 'any_state'
+  }
 
   beforeAll(async () => {
     await MongodbHelper.connect(process.env.MONGO_URL)
     db = await MongodbHelper.getDB()
 
-    await db.collection(COLLECTION_USERS).insertOne({
-      email: 'valid_email@mail.com',
-      password: 'hashed_password',
-      age: 32,
-      state: 'any_state'
-    })
-
-    fakeUser = await db.collection(COLLECTION_USERS).findOne({ email: 'valid_email@mail.com' })
+    await db.collection(COLLECTION_USERS).insertOne(fakeUser)
   })
 
   afterAll(async () => {
     await db.collection(COLLECTION_USERS).deleteOne({ _id: fakeUser._id })
-    await db.collection(COLLECTION_USERS).deleteMany({})
-
-    fakeUser = null
-
     await MongodbHelper.disconnect()
   })
 
