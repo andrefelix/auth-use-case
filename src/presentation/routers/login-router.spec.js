@@ -55,7 +55,7 @@ const makeSut = () => {
   const authUseCaseSpy = makeAuthuseCase()
   const emailValidatorSpy = makeEmailValidator()
 
-  const sut = new LoginRouter(authUseCaseSpy, emailValidatorSpy)
+  const sut = new LoginRouter({ authUseCase: authUseCaseSpy, emailValidator: emailValidatorSpy })
 
   return { sut, authUseCaseSpy, emailValidatorSpy }
 }
@@ -135,12 +135,9 @@ describe('Login Router', () => {
   })
 
   it('Should return 401 when invalid credentials are provided', async () => {
-    const authUseCaseSpy = makeAuthuseCase()
-    authUseCaseSpy.accessToken = null
+    const { sut } = makeSut()
+    sut.authUseCase.accessToken = null
 
-    const emailValidatorSpy = makeEmailValidator()
-
-    const sut = new LoginRouter(authUseCaseSpy, emailValidatorSpy)
     const httpRequest = {
       body: {
         email: 'invalid_email@mail.com',
