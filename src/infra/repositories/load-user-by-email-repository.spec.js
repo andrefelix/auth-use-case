@@ -7,8 +7,7 @@ const COLLECTION_USERS = 'users'
 let db = null
 
 function makeSut () {
-  const userModel = db.collection(COLLECTION_USERS)
-  return new LoadUserByEmailRepository(userModel)
+  return new LoadUserByEmailRepository()
 }
 
 describe('LoadUserByEmail Repository', () => {
@@ -45,17 +44,9 @@ describe('LoadUserByEmail Repository', () => {
     expect(user).toEqual({ _id: fakeUser._id, password: fakeUser.password })
   })
 
-  describe('Throw Errors', () => {
-    it('should throw if userModel is not provided', async () => {
-      const sut = new LoadUserByEmailRepository()
-      const promise = sut.load('any_email@mail.com')
-      await expect(promise).rejects.toThrow()
-    })
-
-    it('should throw if email is not provided', async () => {
-      const sut = makeSut()
-      const promise = sut.load()
-      await expect(promise).rejects.toThrow(new MissingParamError('email'))
-    })
+  it('should throw if email is not provided', async () => {
+    const sut = makeSut()
+    const promise = sut.load()
+    await expect(promise).rejects.toThrow(new MissingParamError('email'))
   })
 })

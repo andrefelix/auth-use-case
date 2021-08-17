@@ -7,8 +7,7 @@ const COLLECTION_USERS = 'users'
 let db = null
 
 function makeSut () {
-  const userModel = db.collection(COLLECTION_USERS)
-  return new UpdateAccessTokenRepository(userModel)
+  return new UpdateAccessTokenRepository()
 }
 
 describe('UpdateAccessToken Repository', () => {
@@ -36,21 +35,14 @@ describe('UpdateAccessToken Repository', () => {
     const sut = makeSut()
     await sut.update(fakeUser._id, 'valid_accesToken')
 
-    const user = await sut.userModel.findOne({ _id: fakeUser._id })
+    const db = await MongodbHelper.getDB()
+    const user = await db.collection(COLLECTION_USERS).findOne({ _id: fakeUser._id })
     expect(user.accessToken).toBe('valid_accesToken')
   })
 
-  describe('Throw Error', () => {
-    it('should throw if userModel is not provided', async () => {
-      const sut = new UpdateAccessTokenRepository()
-      const promise = sut.update(fakeUser._id, 'valid_accessToken')
-      await expect(promise).rejects.toThrow()
-    })
-
-    it('should throw if parameters are not provided', async () => {
-      const sut = makeSut()
-      await expect(sut.update()).rejects.toThrow(new MissingParamError('userId'))
-      await expect(sut.update(fakeUser._id)).rejects.toThrow(new MissingParamError('accessToken'))
-    })
+  it('should throw if parameters are not provided', async () => {
+    const sut = makeSut()
+    await expect(sut.update()).rejects.toThrow(new MissingParamError('userId'))
+    await expect(sut.update(fakeUser._id)).rejects.toThrow(new MissingParamError('accessToken'))
   })
 })
