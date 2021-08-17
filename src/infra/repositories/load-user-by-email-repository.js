@@ -7,10 +7,10 @@ module.exports = class LoadUserByEmailRepository {
       throw new MissingParamError('email')
     }
 
-    const db = await MongodbHelper.getDB()
+    const userModel = await MongodbHelper.getCollection('users')
     const query = { email }
     const requiredProps = { password: 1 }
-    const user = await db.collection('users').findOne(query, { projection: requiredProps })
+    const user = await userModel.findOne(query, { projection: requiredProps })
 
     return user
   }

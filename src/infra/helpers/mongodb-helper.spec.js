@@ -5,7 +5,7 @@ describe('MongoDb Helper', () => {
     await MongodbHelper.disconnect()
   })
 
-  it('should reconnect when getDB() is invoked and client is disconnect', async () => {
+  it('should reconnect when getCollection() is invoked and client is disconnect', async () => {
     const sut = MongodbHelper
 
     await sut.connect(process.env.MONGO_URL)
@@ -14,7 +14,7 @@ describe('MongoDb Helper', () => {
     await sut.disconnect()
     expect(sut.db).toBeNull()
 
-    const db = await sut.getDB()
-    expect(db).toBeTruthy()
+    const userModel = await sut.getCollection('users')
+    expect(userModel).toBeTruthy()
   })
 })

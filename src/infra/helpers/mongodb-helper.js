@@ -19,11 +19,11 @@ module.exports = {
     this.db = null
   },
 
-  async getDB () {
+  async getCollection (collectionName) {
     if (!this.connection || !this.connection.isConnected()) {
       await this.connect(this.uri, this.dbName)
     }
 
-    return this.db
+    return this.db.collection(collectionName)
   }
 }
