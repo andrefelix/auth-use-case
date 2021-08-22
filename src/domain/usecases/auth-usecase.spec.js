@@ -11,7 +11,7 @@ function makeLoadUserByEmailRepository () {
 
   const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy()
   loadUserByEmailRepositorySpy.user = {
-    id: 'any_id',
+    _id: 'any_id',
     password: 'any_hashed_password'
   }
 
@@ -146,7 +146,7 @@ describe('Auth Use Case', () => {
   it('should call TokenGenerator with correct userId', async () => {
     const { sut, tokenGeneratorSpy, loadUserByEmailRepositorySpy } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
-    expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user.id)
+    expect(tokenGeneratorSpy.userId).toBe(loadUserByEmailRepositorySpy.user._id)
   })
 
   it('should an accessToken if correct credentials are provided', async () => {
@@ -158,7 +158,7 @@ describe('Auth Use Case', () => {
   it('should call UpdateAccessTokenRepository with correct values', async () => {
     const { sut, updateAccessTokenRepositorySpy, loadUserByEmailRepositorySpy, tokenGeneratorSpy } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
-    expect(updateAccessTokenRepositorySpy.userId).toBe(loadUserByEmailRepositorySpy.user.id)
+    expect(updateAccessTokenRepositorySpy.userId).toBe(loadUserByEmailRepositorySpy.user._id)
     expect(updateAccessTokenRepositorySpy.accessToken).toBe(tokenGeneratorSpy.accessToken)
   })
 
