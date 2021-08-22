@@ -4,6 +4,14 @@ const MissingParamError = require('../../utils/errors/missing-param-error')
 
 const COLLECTION_USERS = 'users'
 
+const fakeUser = {
+  _id: 'any_id',
+  email: 'valid_email@mail.com',
+  password: 'hashed_password',
+  age: 32,
+  state: 'any_state'
+}
+
 let userModel = null
 
 function makeSut () {
@@ -11,14 +19,6 @@ function makeSut () {
 }
 
 describe('LoadUserByEmail Repository', () => {
-  const fakeUser = {
-    _id: 'any_id',
-    email: 'valid_email@mail.com',
-    password: 'hashed_password',
-    age: 32,
-    state: 'any_state'
-  }
-
   beforeAll(async () => {
     await MongodbHelper.connect(process.env.MONGO_URL)
     userModel = await MongodbHelper.getCollection(COLLECTION_USERS)
