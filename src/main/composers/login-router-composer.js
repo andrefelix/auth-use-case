@@ -7,14 +7,17 @@ const AuthUseCase = require('../../domain/usecases/auth-usecase')
 const EmailValidator = require('../../utils/email-validator')
 const env = require('../config/env')
 
-const authUseCase = new AuthUseCase({
-  loadUserByEmailRepository: new LoadUserByEmailRepository(),
-  updateAccessTokenRepository: new UpdateAccessTokenRepository(),
-  encrypter: new Encrypter(),
-  tokenGenerator: new TokenGenerator(env.tokenSecret)
-})
+module.exports = class LoginRouterComposer {
+  static compose () {
+    const authUseCase = new AuthUseCase({
+      loadUserByEmailRepository: new LoadUserByEmailRepository(),
+      updateAccessTokenRepository: new UpdateAccessTokenRepository(),
+      encrypter: new Encrypter(),
+      tokenGenerator: new TokenGenerator(env.tokenSecret)
+    })
 
-const emailValidator = new EmailValidator()
-const loginRouter = new LoginRouter(authUseCase, emailValidator)
+    const emailValidator = new EmailValidator()
 
-module.exports = loginRouter
+    return new LoginRouter(authUseCase, emailValidator)
+  }
+}
