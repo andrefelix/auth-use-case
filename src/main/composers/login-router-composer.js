@@ -18,6 +18,6 @@ module.exports = class LoginRouterComposer {
 
     const emailValidator = new EmailValidator()
 
-    return new LoginRouter(authUseCase, emailValidator)
+    return new LoginRouter({ authUseCase, emailValidator })
   }
 }

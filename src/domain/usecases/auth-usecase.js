@@ -24,7 +24,7 @@ module.exports = class AuthUseCase {
       return null
     }
 
-    const accessToken = await this.tokenGenerator.generate(this.loadUserByEmailRepository.user._id)
+    const accessToken = await this.tokenGenerator.generate(user._id)
 
     await this.updateAccessTokenRepository.update(user._id, accessToken)
 
